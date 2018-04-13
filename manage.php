@@ -22,7 +22,14 @@ $websites = json_decode(file_get_contents($getApiUrl), true);
 
 foreach($websites as $url => $name) {
     //@Laura. Overview of all the websites here
-    $HTMLContent = $HTMLContent . '<a style="color:black" href="' . $url . '">' . $name . '</a></br>';
+    $HTMLContent = $HTMLContent . '<tr>'.
+                                    '<td style="text-align: right;">'.
+                                        '<div style="color:black"><a style="color:black" href="' . $url . '">'.$name . '</a>'.
+                                    '&nbsp;&nbsp;</td>'.
+                                    '<td style="text-align: left;">'.
+                                        $url.
+                                    '</td>'.
+                                  '</tr></div>';
 }
 
 //Gives out the html
@@ -30,8 +37,8 @@ $HTML = str_replace('[elm_Page_Content]', "", $HTML);
 echo $HTML;
 ?>
 
-<div style="margin-left: 25% ">
-    <table style="width:70%" >
+<div style="margin-left: 15%; margin-right: 15% ">
+    <table style="width:100%" >
         <tr>
             <td><h2>Edit</h2></td>
             <th><h2 >Website overview</h2></th>
@@ -39,7 +46,7 @@ echo $HTML;
 
         <tr>
             <td>Add Website:</td>
-            <th rowspan="6" style="vertical-align: text-top"><?php echo "<p> <font color=blue>".$HTMLContent."</p>" ?> </th>
+            <th rowspan="6" style="vertical-align: text-top"><?php echo "<table style='width: 100%;'>".$HTMLContent."</table>" ?> </th>
         </tr>
 
         <form action="index.php?page=elm_Page_Edit" method="post">
