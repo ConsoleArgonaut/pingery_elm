@@ -16,7 +16,9 @@ $HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm - Manage
 $HTMLContent = '';
 
 //Gets Content from API
-$websites = json_decode(file_get_contents('http://' . $_SERVER['HTTP_HOST'] . '/api/websites/get.php'), true);
+$currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$getApiUrl = explode("/manage.php", $currentUrl)[0] . '/api/websites/get.php';
+$websites = json_decode(file_get_contents($getApiUrl), true);
 
 foreach($websites as $url => $name) {
     //@Laura. Overview of all the websites here
