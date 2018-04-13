@@ -22,11 +22,58 @@ $websites = json_decode(file_get_contents($getApiUrl), true);
 
 foreach($websites as $url => $name) {
     //@Laura. Overview of all the websites here
-    $HTMLContent = $HTMLContent . '<a href="' . $url . '">' . $name . '</a></br>';
+    $HTMLContent = $HTMLContent . '<a style="color:black" href="' . $url . '">' . $name . '</a></br>';
 }
 
 //Gives out the html
-$HTML = str_replace('[elm_Page_Content]', $HTMLContent, $HTML);
+$HTML = str_replace('[elm_Page_Content]', "", $HTML);
 echo $HTML;
-
 ?>
+
+<div style="margin-left: 25% ">
+    <table style="width:70%" >
+        <tr>
+            <td><h2>Edit</h2></td>
+            <th><h2 >Website overview</h2></th>
+        </tr>
+
+        <tr>
+            <td>Add Website:</td>
+            <th rowspan="6" style="vertical-align: text-top"><?php echo "<p> <font color=blue>".$HTMLContent."</p>" ?> </th>
+        </tr>
+
+        <form action="index.php?page=elm_Page_Edit" method="post">
+            <tr>
+                <td><input type="text" id="elm_addPage_Name" value="Example Website" name="elm_addPage_Name" size="42" ></td>
+            </tr>
+
+            <tr>
+                <td><input type="text" id="elm_addPage_Url" value="www.example-website.com" name="elm_addPage_Url" size="42" ></td>
+            </tr>
+
+            <tr>
+                <td >
+                    <input type="submit" value=" OK " id="elm_addPage_Execute" name="elm_addPage_Execute">
+                </td>
+            </tr>
+        </form>
+
+        <form action="index.php?page=elm_Page_Delete" method="post">
+            <tr>
+                <td><h2 style="margin-top: 10%">Delete</h2></td>
+            </tr>
+
+            <tr>
+                <td><input type="text" id="elm_deletePage_Name" value="www.example-webseite.com" name="elm_addPage_Name" size="42" ></td>
+            </tr>
+
+            <tr>
+                <td>
+                    <input type="submit" value=" OK " id="elm_deletePage_Execute" name="elm_deletePage_Execute">
+                </td>
+
+            </tr>
+        </form>
+
+    </table>
+</div>
