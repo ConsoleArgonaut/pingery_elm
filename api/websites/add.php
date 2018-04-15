@@ -2,11 +2,17 @@
 
 //This is the api to add a website
 //GET-Parameters: URL & Name
-
 $urlToAdd = $_GET['URL'];
 $nameToAdd = $_GET['Name'];
 
-//@Enrico: Please add a new website to the server with the given objects $urlToAdd and $nameToAdd
-//Don't forget to check if a Website with the same URL already exists. The URL must be unique!
-
+$sql = $conn->prepare("SELECT * FROM elm_websites WHERE `URL` LIKE ?;");
+$sql->bindParam(1, $urlToDelete);
+if ($sql->execute() == FALSE){
+    $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
+        VALUES
+        (?, ?);");
+    $sql->bindParam(1, $nameToAdd);
+    $sql->bindParam(2, $urlToAdd);
+    $pages = $sql->execute();
+}
 ?>
