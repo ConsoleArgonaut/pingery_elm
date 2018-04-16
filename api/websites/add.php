@@ -5,8 +5,8 @@
 $urlToAdd = $_GET['URL'];
 $nameToAdd = $_GET['Name'];
 
-$sql = $conn->prepare("SELECT * FROM elm_websites WHERE `URL` LIKE ?;");
-$sql->bindParam(1, $urlToDelete);
+$sql = $conn->prepare("SELECT * FROM elm_websites WHERE `URL` = ?;");
+$sql->bindParam(1, $urlToAdd);
 if ($sql->execute() == FALSE){
     $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
         VALUES

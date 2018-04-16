@@ -30,6 +30,20 @@ if ($sql1->execute() == FALSE){
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     $sql->execute();
 }
+$sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Official PHP Website' AND `URL` = 'http://php.net')");
+if ($sql->execute()){
+    $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
+        VALUES
+        ('Official PHP Website', 'http://php.net');");
+    $sql->execute();
+    $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Official PHP Website' AND `URL` = 'http://php.net')");
+    if ($sql->execute()){
+        $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
+            VALUES
+            ('Stackoverflow -> questions and answers', 'https://stackoverflow.com');");
+        $sql->execute();
+    }
+}
 
 shell_exec('ping '.$URL);
 
