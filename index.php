@@ -80,13 +80,14 @@ foreach ($websites AS $URL){
         $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
         $sql->bindParam(1, $URL);
         $sql->bindParam(2, $message);
-        if ($sql->execute() == FALSE){
+        if ($sql->execute() == FALSE) {
             $sql = $conn->prepare("UPDATE `elm_log`
                 SET `Message` = ?, `Success`= FALSE
                 WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
             $sql->bindParam(1, $message);
             $sql->bindParam(2, $URL);
             $sql->execute();
+        }
     }
 }
 //Placeholders, replace with the actual code (like above)
