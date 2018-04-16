@@ -30,13 +30,13 @@ if ($sql1->execute() == FALSE){
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     $sql->execute();
 }
-$sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Official PHP Website' AND `URL` = 'http://php.net')");
+$sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Official PHP Website' AND `URL` = 'http://php.net';");
 if ($sql->execute() == FALSE){
     $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
         VALUES
         ('Official PHP Website', 'http://php.net');");
     $sql->execute();
-    $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Official PHP Website' AND `URL` = 'http://php.net')");
+    $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Official PHP Website' AND `URL` = 'http://php.net';");
     if ($sql->execute() == FALSE){
         $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
             VALUES
@@ -45,7 +45,6 @@ if ($sql->execute() == FALSE){
     }
 }
 
-shell_exec('ping '.$URL);
 
 //Code to create HMTL page content
 //Replaces default values in index.html
@@ -61,10 +60,39 @@ $currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_
 $getApiUrl = explode("/manage.php", $currentUrl)[0] . '/api/websites/get.php';
 $websites = json_decode(file_get_contents($getApiUrl), true);
 
+foreach ($websites AS $URL){
+    //shell_exec('ping '.$URL);
+    $ping = fsockopen($URL, $errNo, $errStr);
+    $message = "ERROR: $errNo -> $errStr";
+    if (!$ping) {
+        $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
+        $sql->bindParam(1, $URL);
+        $sql->bindParam(2, $message);
+        if ($sql->execute() == FALSE){
+            $sql = $conn->prepare("UPDATE `elm_log`
+                SET `Message` = ?, `Success`= FALSE
+                WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
+            $sql->bindParam(1, $message);
+            $sql->bindParam(2, $URL);
+            $sql->execute();
+        }
+    } else {
+        $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
+        $sql->bindParam(1, $URL);
+        $sql->bindParam(2, $message);
+        if ($sql->execute() == FALSE){
+            $sql = $conn->prepare("UPDATE `elm_log`
+                SET `Message` = ?, `Success`= FALSE
+                WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
+            $sql->bindParam(1, $message);
+            $sql->bindParam(2, $URL);
+            $sql->execute();
+    }
+}
 //Placeholders, replace with the actual code (like above)
 //$timeDate = '20.12.2012 12:34:56';
 //$online = 'Ja';
-//$message = 'Diese Webseite funktionierte wieder um 24:23:22 Uhr.';SELECT FirstName, LastName, OrderCount = (SELECT COUNT(O.Id) FROM [Order] O WHERE O.CustomerId = C.Id) FROM Customer C
+//$message = 'Diese Webseite funktionierte wieder um 24:23:22 Uhr.';
 $sql = $conn->prepare("SELECT (SELECT `Name` FROM `elm_websites` W WHERE W.`websitesId` = L.`websitesFK`) AS `Name`, 
                                         (SELECT `URL` FROM `elm_websites` W WHERE W.`websitesId` = L.`websitesFK`) AS `URL`, 
                                         `Timestamp`, 
