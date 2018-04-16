@@ -31,10 +31,10 @@ SET time_zone = "+00:00";
 CREATE TABLE `elm_log` (
   `logId` int(11) NOT NULL,
   `websitesFK` int(11) DEFAULT NULL,
-  `Name` varchar(255) NOT NULL,
-  `URL` varchar(255) NOT NULL,
-  `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `Message` varchar(255) NOT NULL,
+  `Success` BOOLEAN,
+  `callerIP` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
