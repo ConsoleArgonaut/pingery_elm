@@ -13,11 +13,6 @@ foreach ($pages as $page) {
     $pushObject = $page['URL']." => ".$page['Name'];
     array_push($websites, $pushObject);
 }
-// Creates array of websites
-//$websites = array(
-//    "http://php.net" => "Official PHP Website",
-//    "https://stackoverflow.com" => "Stackoverflow -> questions and answers"
-//);
 
 // Creation and output of Json data
 echo json_encode($websites);

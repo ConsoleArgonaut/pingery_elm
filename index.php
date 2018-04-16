@@ -31,13 +31,13 @@ if ($sql1->execute() == FALSE){
     $sql->execute();
 }
 $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Official PHP Website' AND `URL` = 'http://php.net')");
-if ($sql->execute()){
+if ($sql->execute() == FALSE){
     $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
         VALUES
         ('Official PHP Website', 'http://php.net');");
     $sql->execute();
     $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Official PHP Website' AND `URL` = 'http://php.net')");
-    if ($sql->execute()){
+    if ($sql->execute() == FALSE){
         $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
             VALUES
             ('Stackoverflow -> questions and answers', 'https://stackoverflow.com');");
@@ -62,9 +62,16 @@ $getApiUrl = explode("/manage.php", $currentUrl)[0] . '/api/websites/get.php';
 $websites = json_decode(file_get_contents($getApiUrl), true);
 
 //Placeholders, replace with the actual code (like above)
-$timeDate = '20.12.2012 12:34:56';
-$online = 'Ja';
-$message = 'Diese Webseite funktionierte wieder um 24:23:22 Uhr.';
+//$timeDate = '20.12.2012 12:34:56';
+//$online = 'Ja';
+//$message = 'Diese Webseite funktionierte wieder um 24:23:22 Uhr.';SELECT FirstName, LastName, OrderCount = (SELECT COUNT(O.Id) FROM [Order] O WHERE O.CustomerId = C.Id) FROM Customer C
+$sql = $conn->prepare("SELECT (SELECT `Name` FROM `elm_websites` W WHERE W.`websitesId` = L.`websitesFK`) AS `Name`, 
+                                        (SELECT `URL` FROM `elm_websites` W WHERE W.`websitesId` = L.`websitesFK`) AS `URL`, 
+                                        `Timestamp`, 
+                                        `Message`, 
+                                        `Success` 
+                                 FROM elm_log L");
+$sql->execute();
 
 foreach($websites as $url => $name) {
     $HTMLContent = $HTMLContent .
