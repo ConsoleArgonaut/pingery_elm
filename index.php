@@ -70,8 +70,6 @@ if ($sql->execute() == FALSE){
     }
 }
 
-<<<<<<< HEAD
-=======
 //Code to create HMTL page content
 //Replaces default values in index.html
 $HTML = file_get_contents('html/index.html', FILE_USE_INCLUDE_PATH);
@@ -81,7 +79,6 @@ $HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm</a>', $H
 //Replace this with log information!!!
 $HTMLContent = '';
 
->>>>>>> db
 //Gets Content from API
 $currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 $getApiUrl = explode("/index.php", $currentUrl)[0] . '/api/websites/get.php';
