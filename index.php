@@ -45,7 +45,6 @@ if ($sql->execute() == FALSE){
     }
 }
 
-
 //Code to create HMTL page content
 //Replaces default values in index.html
 $HTML = file_get_contents('html/index.html', FILE_USE_INCLUDE_PATH);
@@ -60,32 +59,46 @@ $currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_
 $getApiUrl = explode("/manage.php", $currentUrl)[0] . '/api/websites/get.php';
 $websites = json_decode(file_get_contents($getApiUrl), true);
 
-foreach ($websites AS $URL){
-    //shell_exec('ping '.$URL);
-    $ping = fsockopen($URL, $errNo, $errStr);
+$pages = array();
+$sql = $conn->prepare("SELECT * FROM `elm_websites`;");
+$sql->execute();
+while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
+    array_push($pages, $row);
+}
+foreach ($pages AS $page){
+    require_once("html/index.html");
+    $errNo = 0;
+    $errStr = "";
+    $ping = fsockopen($page['URL'], $errNo, $errStr);
     $message = "ERROR: $errNo -> $errStr";
     if (!$ping) {
         $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
-        $sql->bindParam(1, $URL);
+        $sql->bindParam(1, $page['URL']);
         $sql->bindParam(2, $message);
         if ($sql->execute() == FALSE){
             $sql = $conn->prepare("UPDATE `elm_log`
                 SET `Message` = ?, `Success`= FALSE
                 WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
             $sql->bindParam(1, $message);
-            $sql->bindParam(2, $URL);
+            $sql->bindParam(2, $page['URL']);
             $sql->execute();
+            ?>
+            <script>
+                // parameters: service_id, template_id, template_parameters
+                emailjs.send("default_service","pinger_elm_alert",{URL: <?php $page['URL'] ?>, Name: <?php $page['Name'] ?>});
+            </script>
+            <?php
         }
     } else {
         $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
-        $sql->bindParam(1, $URL);
+        $sql->bindParam(1, $page['URL']);
         $sql->bindParam(2, $message);
         if ($sql->execute() == FALSE) {
             $sql = $conn->prepare("UPDATE `elm_log`
                 SET `Message` = ?, `Success`= FALSE
                 WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
             $sql->bindParam(1, $message);
-            $sql->bindParam(2, $URL);
+            $sql->bindParam(2, $page['URL']);
             $sql->execute();
         }
     }
