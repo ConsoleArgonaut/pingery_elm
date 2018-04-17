@@ -101,8 +101,11 @@ $sql = $conn->prepare("SELECT (SELECT `Name` FROM `elm_websites` W WHERE W.`webs
                                         `Success` 
                                  FROM elm_log L");
 $sql->execute();
-
-foreach($websites as $url => $name) {
+$sites = array();
+while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
+    array_push($sites, $row);
+}
+foreach($sites as $url => $name) {
     $HTMLContent = $HTMLContent .
         '<tr>'.
             '<td style="text-align: left;">'.
