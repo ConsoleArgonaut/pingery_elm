@@ -20,16 +20,18 @@ $currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_
 $getApiUrl = explode("/manage.php", $currentUrl)[0] . '/api/websites/get.php';
 $websites = json_decode(file_get_contents($getApiUrl), true);
 
-foreach($websites as $url => $name) {
-    //@Laura. Overview of all the websites here
-    $HTMLContent = $HTMLContent . '<tr>'.
-                                    '<td style="text-align: right;">'.
-                                        '<div style="color:black"><a style="color:black" href="' . $url . '">'.$name . '</a>'.
-                                    '&nbsp;&nbsp;</td>'.
-                                    '<td style="text-align: left;">'.
-                                        $url.
-                                    '</td>'.
-                                  '</tr></div>';
+if($websites != null) {
+    foreach($websites as $url => $name) {
+        //@Laura. Overview of all the websites here
+        $HTMLContent = $HTMLContent . '<tr>'.
+                                        '<td style="text-align: right;">'.
+                                            '<div style="color:black"><a style="color:black" href="' . $url . '">'.$name . '</a>'.
+                                        '&nbsp;&nbsp;</td>'.
+                                        '<td style="text-align: left;">'.
+                                            $url.
+                                        '</td>'.
+                                      '</tr></div>';
+    }
 }
 
 //Gives out the html
@@ -49,13 +51,13 @@ echo $HTML;
             <th rowspan="6" style="vertical-align: text-top"><?php echo "<table style='width: 100%;'>".$HTMLContent."</table>" ?> </th>
         </tr>
 
-        <form action="index.php?page=elm_Page_Edit" method="post">
+        <form action="manage.php" method="get">
             <tr>
-                <td><input type="text" id="elm_addPage_Name" value="Example Website" name="elm_addPage_Name" size="42" ></td>
+                <td><input type="text" id="elm_addPage_Name" value="Example Website" name="URL" size="42" ></td>
             </tr>
 
             <tr>
-                <td><input type="text" id="elm_addPage_Url" value="www.example-website.com" name="elm_addPage_Url" size="42" ></td>
+                <td><input type="text" id="elm_addPage_Url" value="www.example-website.com" name="Name" size="42" ></td>
             </tr>
 
             <tr>
@@ -65,7 +67,7 @@ echo $HTML;
             </tr>
         </form>
 
-        <form action="index.php?page=elm_Page_Delete" method="post">
+        <form action="manage.php" method="post">
             <tr>
                 <td><h2 style="margin-top: 10%">Delete</h2></td>
             </tr>
@@ -83,4 +85,3 @@ echo $HTML;
         </form>
 
     </table>
-</div>
