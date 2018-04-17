@@ -20,68 +20,71 @@ $currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_
 $getApiUrl = explode("/manage.php", $currentUrl)[0] . '/api/websites/get.php';
 $websites = json_decode(file_get_contents($getApiUrl), true);
 
+if(isset($_POST['elm_addPage_Execute'])) {
+    $r = new HttpRequest(explode("/api/websites/add.php", $currentUrl)[0]. "/api/websites/add.php?URL=" .$_POST['URL'].'&Name='.$_POST['Name'], HttpRequest::METH_GET);
+    $r->send();
+}
+if(isset($_POST['elm_deletePage_Execute'])) {
+    $r = new HttpRequest(explode("/api/websites/delete.php", $currentUrl)[0]. "/api/websites/add.php?URL=" .$_POST['URL'], HttpRequest::METH_GET);
+    $r->send();
+}
+
+$HTMLContent = $HTMLContent .
+    '<div style="margin-left: 15%; margin-right: 15% ">'.
+    '<table style="width:100%" >'.
+    '<tr>'.
+    '<td><h2>Edit</h2></td>'.
+    '<th><h2 >Website overview</h2></th>'.
+    '</tr>'.
+    '<tr>'.
+    '<td>Add Website:</td>'.
+    '<th rowspan="6" style="vertical-align: text-top"><table style="width: 100%;">';
+
 if($websites != null) {
     foreach($websites as $url => $name) {
         //@Laura. Overview of all the websites here
-        $HTMLContent = $HTMLContent . '<tr>'.
-                                        '<td style="text-align: right;">'.
-                                            '<div style="color:black"><a style="color:black" href="' . $url . '">'.$name . '</a>'.
-                                        '&nbsp;&nbsp;</td>'.
-                                        '<td style="text-align: left;">'.
-                                            $url.
-                                        '</td>'.
-                                      '</tr></div>';
+        $HTMLContent = $HTMLContent .
+                            '<tr>'.
+                            '<td style="text-align: right;">'.
+                                '<div style="color:black"><a style="color:black" href="' . $url . '">'.$name . '</a>'.
+                            '&nbsp;&nbsp;</td>'.
+                            '<td style="text-align: left;">'.
+                                $url.
+                            '</td>'.
+                          '</tr>';
     }
 }
+$HTMLContent = $HTMLContent .
+'</div>'.
+'</table></th>'.
+'</tr>'.
+'<form action="'. explode("/manage.php", $currentUrl)[0]. "/api/websites/add.php" .'" method="get" target="_blank">'.
+'<tr><td><input type="text" id="elm_addPage_Name" value="Example Website" name="URL" size="42" ></td></tr>'.
+'<tr><td><input type="text" id="elm_addPage_Url" value="www.example-website.com" name="Name" size="42" ></td></tr>'.
+'<tr><td ><input type="submit" value=" OK " id="elm_addPage_Execute" name="elm_addPage_Execute"></td></tr>
+                    </form>
+                    
+                    <form action="'.explode("/manage.php", $currentUrl)[0]. "/api/websites/delete.php".'" method="get" target="_blank">
+                        <tr>
+                            <td><h2 style="margin-top: 10%">Delete</h2></td>
+                        </tr>
+            
+                        <tr>
+                            <td><input type="text" id="elm_deletePage_Url" value="www.example-webseite.com" name="URL" size="42" ></td>
+                        </tr>
+            
+                        <tr>
+                            <td>
+                                <input type="submit" value=" OK " id="elm_deletePage_Execute" name="elm_deletePage_Execute">
+                            </td>
+            
+                        </tr>
+                    </form>
+            
+                </table>
+            </div>';
 
 //Gives out the html
-$HTML = str_replace('[elm_Page_Content]', "", $HTML);
+$HTML = str_replace('[elm_Page_Content]', $HTMLContent, $HTML);
 echo $HTML;
 ?>
-
-<div style="margin-left: 15%; margin-right: 15% ">
-    <table style="width:100%" >
-        <tr>
-            <td><h2>Edit</h2></td>
-            <th><h2 >Website overview</h2></th>
-        </tr>
-
-        <tr>
-            <td>Add Website:</td>
-            <th rowspan="6" style="vertical-align: text-top"><?php echo "<table style='width: 100%;'>".$HTMLContent."</table>" ?> </th>
-        </tr>
-
-        <form action="manage.php" method="get">
-            <tr>
-                <td><input type="text" id="elm_addPage_Name" value="Example Website" name="URL" size="42" ></td>
-            </tr>
-
-            <tr>
-                <td><input type="text" id="elm_addPage_Url" value="www.example-website.com" name="Name" size="42" ></td>
-            </tr>
-
-            <tr>
-                <td >
-                    <input type="submit" value=" OK " id="elm_addPage_Execute" name="elm_addPage_Execute">
-                </td>
-            </tr>
-        </form>
-
-        <form action="manage.php" method="post">
-            <tr>
-                <td><h2 style="margin-top: 10%">Delete</h2></td>
-            </tr>
-
-            <tr>
-                <td><input type="text" id="elm_deletePage_Name" value="www.example-webseite.com" name="elm_addPage_Name" size="42" ></td>
-            </tr>
-
-            <tr>
-                <td>
-                    <input type="submit" value=" OK " id="elm_deletePage_Execute" name="elm_deletePage_Execute">
-                </td>
-
-            </tr>
-        </form>
-
-    </table>
