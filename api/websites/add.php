@@ -4,17 +4,18 @@
 //GET-Parameters: URL & Name
 $urlToAdd = $_GET['URL'];
 $nameToAdd = $_GET['Name'];
-<<<<<<< HEAD
-$conn2 = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
-    PDO::ATTR_PERSISTENT => true
-));
-$sql = $conn2->prepare("SELECT * FROM elm_websites WHERE `URL` LIKE ?;");
+
+if (!isset($conn)){
+    $conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
+        PDO::ATTR_PERSISTENT => true
+    ));
+}
+
+$sql = $conn->prepare("SELECT * FROM elm_websites WHERE `URL` LIKE ?;");
 $sql->bindParam(1, $urlToDelete);
-=======
 
 $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `URL` = ?;");
 $sql->bindParam(1, $urlToAdd);
->>>>>>> develop
 if ($sql->execute() == FALSE){
     $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
         VALUES

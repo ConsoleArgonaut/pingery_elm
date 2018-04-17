@@ -4,9 +4,11 @@ session_start();
 // This file is used to show the log and execute the website checks
 // IMPORTANT DO NOT CREATE ANY FUNCTIONS!!!
 include("config.php");
-$conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
-    PDO::ATTR_PERSISTENT => true
-));
+if (!isset($conn)){
+    $conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
+        PDO::ATTR_PERSISTENT => true
+    ));
+}
 $sql = $conn->prepare("SET NAMES utf8;");
 $sql->execute();
 $sql1 = $conn->prepare("SELECT * FROM elm_log;");
@@ -45,7 +47,6 @@ if ($sql->execute() == FALSE){
     }
 }
 
-
 //Code to create HMTL page content
 //Replaces default values in index.html
 $HTML = file_get_contents('html/index.html', FILE_USE_INCLUDE_PATH);
@@ -61,7 +62,6 @@ $getApiUrl = explode("/manage.php", $currentUrl)[0] . '/api/websites/get.php';
 $websites = json_decode(file_get_contents($getApiUrl), true);
 
 foreach ($websites AS $URL){
-    //shell_exec('ping '.$URL);
     $ping = fsockopen($URL, $errNo, $errStr);
     $message = "ERROR: $errNo -> $errStr";
     if (!$ping) {
@@ -100,7 +100,6 @@ $sql = $conn->prepare("SELECT (SELECT `Name` FROM `elm_websites` W WHERE W.`webs
                                         `Message`, 
                                         `Success` 
                                  FROM elm_log L");
-$sql->execute();
 $sites = array();
 while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($sites, $row);
