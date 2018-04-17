@@ -3,39 +3,33 @@
 // This is file is used to show the different existing websites and give the possibility to delete or add them
 
 
-//region Description
+//region Base HTML Creation
 //Code to create HMTL page content
 //Replaces default values in index.html
 $HTML = file_get_contents('html/index.html', FILE_USE_INCLUDE_PATH);
 $HTML = str_replace('[elm_Login_Link]', '..\\index.php', $HTML);
 $HTML = str_replace('[elm_Login_Text]', 'See log', $HTML);
 $HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm - Manage websites</a>', $HTML);
-//endregion
 
-//region Description
 //Replace this with:
 //- Add / Delete functions for Websites
 //- Overview of all Websites
 $HTMLContent = '';
 //endregion
 
-//region Description
+//region Gets Websites
 //Gets Content from API
 $currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 $getApiUrl = explode("/manage.php", $currentUrl)[0] . '/api/websites/get.php';
 $websites = json_decode(file_get_contents($getApiUrl), true);
 //endregion
 
-//region Description
+//region Posts to apis
 //Checks if addPage is clicked and sends the data to the api
 if(isset($_POST['elm_addPage_Execute'])) {
     $r = new HttpRequest(explode("/api/websites/add.php", $currentUrl)[0]. "/api/websites/add.php?URL=" .$_POST['URL'].'&Name='.$_POST['Name'], HttpRequest::METH_GET);
     $r->send();
 }
-//endregion
-
-
-//region Description
 //Checks if deletePage is clicked and sends the data (whith page) to the api
 if(isset($_POST['elm_deletePage_Execute'])) {
     $r = new HttpRequest(explode("/api/websites/delete.php", $currentUrl)[0]. "/api/websites/add.php?URL=" .$_POST['URL'], HttpRequest::METH_GET);
@@ -43,7 +37,7 @@ if(isset($_POST['elm_deletePage_Execute'])) {
 }
 //endregion
 
-//region Description
+//region Creation of HTML Content
 $HTMLContent = $HTMLContent .
     '<div style="margin-left: 15%; margin-right: 15% ">
         <table style="width:100%" >
@@ -58,10 +52,7 @@ $HTMLContent = $HTMLContent .
             <tr>
                 <td>Add Website:</td>
                 <th rowspan="6" style="vertical-align: text-top"><table style="width: 100%;">';
-//endregion
 
-
-//region Description
 //prints all webpages (overview)
 if($websites != null) {
     foreach($websites as $url => $name) {
@@ -77,9 +68,7 @@ if($websites != null) {
                             </tr>';
     }
 }
-//endregion
 
-//region Description
 //add and delete Website-formular
 $HTMLContent = $HTMLContent .
                 '</div>
@@ -129,7 +118,7 @@ $HTMLContent = $HTMLContent .
 </div>';
 //endregion
 
-//region Description
+//region Output of HTML Content
 //Gives out the html
 $HTML = str_replace('[elm_Page_Content]', $HTMLContent, $HTML);
 echo $HTML;
