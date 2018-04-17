@@ -24,7 +24,7 @@ if ($sql1->execute() == FALSE){
 
     $sql = $conn->prepare("CREATE TABLE `elm_log` (
         `logId` int(11) NOT NULL,
-        `websitesFK` int(11) DEFAULT NULL,
+        `websitesFK` int(11),
         `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `Message` varchar(255) NOT NULL,
         `Success` BOOLEAN,
@@ -38,11 +38,19 @@ if ($sql->execute() == FALSE){
         VALUES
         ('Official PHP Website', 'http://php.net');");
     $sql->execute();
-    $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Official PHP Website' AND `URL` = 'http://php.net';");
+    $sql = $conn->prepare("INSERT INTO elm_log (`websitesFK`)
+            VALUE
+            ((SELECT `websitesId` FROM `elm_websites` WHERE `URL` = 'http://php.net'));");
+    $sql->execute();
+    $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Stackoverflow -> questions and answers' AND `URL` = 'https://stackoverflow.com';");
     if ($sql->execute() == FALSE){
         $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
             VALUES
             ('Stackoverflow -> questions and answers', 'https://stackoverflow.com');");
+        $sql->execute();
+        $sql = $conn->prepare("INSERT INTO elm_log (`websitesFK`)
+            VALUE
+            ((SELECT `websitesId` FROM `elm_websites` WHERE `URL` = 'https://stackoverflow.com'));");
         $sql->execute();
     }
 }
