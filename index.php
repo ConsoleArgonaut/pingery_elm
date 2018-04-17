@@ -1,8 +1,23 @@
 <?php
 session_start();
+
 // This file is the main file of pingery elm
 // This file is used to show the log and execute the website checks
 // IMPORTANT DO NOT CREATE ANY FUNCTIONS!!!
+
+//region Default HTML Content
+//Code to create HMTL page content
+//Replaces default values in index.html
+$HTML = file_get_contents('html/index.html', FILE_USE_INCLUDE_PATH);
+$HTML = str_replace('[elm_Login_Text]', 'Manage Websites', $HTML);
+$HTML = str_replace('[elm_Login_Link]', 'manage.php', $HTML);
+$HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm</a>', $HTML);
+
+//Replace this with log information!!!
+$HTMLContent = '';
+//endregion
+
+
 include("config.php");
 $conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
     PDO::ATTR_PERSISTENT => true
@@ -45,19 +60,9 @@ if ($sql->execute() == FALSE){
     }
 }
 
-
-//Code to create HMTL page content
-//Replaces default values in index.html
-$HTML = file_get_contents('html/index.html', FILE_USE_INCLUDE_PATH);
-$HTML = str_replace('[elm_Login_Text]', 'Manage Websites', $HTML);
-$HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm</a>', $HTML);
-
-//Replace this with log information!!!
-$HTMLContent = '';
-
 //Gets Content from API
 $currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-$getApiUrl = explode("/manage.php", $currentUrl)[0] . '/api/websites/get.php';
+$getApiUrl = explode("/index.php", $currentUrl)[0] . '/api/websites/get.php';
 $websites = json_decode(file_get_contents($getApiUrl), true);
 
 foreach ($websites AS $URL){
@@ -105,8 +110,27 @@ $sites = array();
 while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($sites, $row);
 }
+
+//region HTML Content creation
+$HTMLContent = $HTMLContent . '<div style=" margin-left: 15%; margin-right: 15%; margin-bottom: 10%">
+    <h2>Welcome to Pingery-Elm</h2>
+    <br>
+
+    <table style="width:100%" >
+        <tr>
+            <th><h3>Website</h3></th>
+            <th><h3>URL</h3></th>
+            <th><h3>date / time</h3></th>
+            <th><h3>online</h3></th>
+            <th><h3>Message</h3></th>
+        </tr>
+        [elm_WebsiteOverview]
+    </table>
+</div>';
+
+$elm_WebsiteOverview = '';
 foreach($sites as $url => $name) {
-    $HTMLContent = $HTMLContent .
+    $elm_WebsiteOverview = $elm_WebsiteOverview .
         '<tr>'.
             '<td style="text-align: left;">'.
                 '<div style="color:black"><a style="color:black" href="' . $url . '">'. $name . '</a> &nbsp;&nbsp;'.
@@ -132,25 +156,11 @@ foreach($sites as $url => $name) {
 
         '</tr></div>';
 }
+$HTMLContent = str_replace('[elm_WebsiteOverview]', $elm_WebsiteOverview, $HTMLContent);
 
 //Gives out the html
-$HTML = str_replace('[elm_Page_Content]', "", $HTML);
+$HTML = str_replace('[elm_Page_Content]', $HTMLContent, $HTML);
 echo $HTML;
+//endregion
 
 ?>
-<div style=" margin-left: 15%; margin-right: 15%; margin-bottom: 10%">
-    <h2>Welcome to Pingery-Elm</h2>
-    <br>
-
-    <table style="width:100%" >
-        <tr>
-            <th><h3>Website</h3></th>
-            <th><h3>URL</h3></th>
-            <th><h3>date / time</h3></th>
-            <th><h3>online</h3></th>
-            <th><h3>Message</h3></th>
-        </tr>
-        <?php echo $HTMLContent; ?>
-    </table>
-
-</div>
