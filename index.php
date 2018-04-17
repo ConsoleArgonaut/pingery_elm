@@ -85,7 +85,9 @@ foreach ($pages AS $page){
             ?>
             <script>
                 // parameters: service_id, template_id, template_parameters
-                emailjs.send("default_service","pinger_elm_alert",{URL: <?php $page['URL'] ?>, Name: <?php $page['Name'] ?>});
+                (function(){
+                    emailjs.send("default_service","pinger_elm_alert",{URL: "<?php $page['URL'] ?>", Name: "<?php $page['Name'] ?>"});
+                })();
             </script>
             <?php
         }
