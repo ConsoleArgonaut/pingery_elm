@@ -3,8 +3,12 @@
 //GET-Parameters: URL
 $urlToDelete = $_GET['URL'];
 
+if (!isset($conn)){
+    $conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
+        PDO::ATTR_PERSISTENT => true
+    ));
+}
 $sql = $conn->prepare("DELETE FROM elm_websites WHERE `URL` = ?;");
 $sql->bindParam(1, $urlToDelete);
 $pages = $sql->execute();
-
 ?>

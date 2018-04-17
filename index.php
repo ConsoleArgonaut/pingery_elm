@@ -19,9 +19,11 @@ $HTMLContent = '';
 
 
 include("config.php");
-$conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
-    PDO::ATTR_PERSISTENT => true
-));
+if (!isset($conn)){
+    $conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
+        PDO::ATTR_PERSISTENT => true
+    ));
+}
 $sql = $conn->prepare("SET NAMES utf8;");
 $sql->execute();
 $sql1 = $conn->prepare("SELECT * FROM elm_log;");
@@ -37,7 +39,7 @@ if ($sql1->execute() == FALSE){
 
     $sql = $conn->prepare("CREATE TABLE `elm_log` (
         `logId` int(11) NOT NULL,
-        `websitesFK` int(11) DEFAULT NULL,
+        `websitesFK` int(11),
         `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `Message` varchar(255) NOT NULL,
         `Success` BOOLEAN,
@@ -51,22 +53,41 @@ if ($sql->execute() == FALSE){
         VALUES
         ('Official PHP Website', 'http://php.net');");
     $sql->execute();
-    $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Official PHP Website' AND `URL` = 'http://php.net';");
+    $sql = $conn->prepare("INSERT INTO elm_log (`websitesFK`)
+            VALUE
+            ((SELECT `websitesId` FROM `elm_websites` WHERE `URL` = 'http://php.net'));");
+    $sql->execute();
+    $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Stackoverflow -> questions and answers' AND `URL` = 'https://stackoverflow.com';");
     if ($sql->execute() == FALSE){
         $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
             VALUES
             ('Stackoverflow -> questions and answers', 'https://stackoverflow.com');");
         $sql->execute();
+        $sql = $conn->prepare("INSERT INTO elm_log (`websitesFK`)
+            VALUE
+            ((SELECT `websitesId` FROM `elm_websites` WHERE `URL` = 'https://stackoverflow.com'));");
+        $sql->execute();
     }
 }
 
+<<<<<<< HEAD
+=======
+//Code to create HMTL page content
+//Replaces default values in index.html
+$HTML = file_get_contents('html/index.html', FILE_USE_INCLUDE_PATH);
+$HTML = str_replace('[elm_Login_Text]', 'Manage Websites', $HTML);
+$HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm</a>', $HTML);
+
+//Replace this with log information!!!
+$HTMLContent = '';
+
+>>>>>>> db
 //Gets Content from API
 $currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 $getApiUrl = explode("/index.php", $currentUrl)[0] . '/api/websites/get.php';
 $websites = json_decode(file_get_contents($getApiUrl), true);
 
 foreach ($websites AS $URL){
-    //shell_exec('ping '.$URL);
     $ping = fsockopen($URL, $errNo, $errStr);
     $message = "ERROR: $errNo -> $errStr";
     if (!$ping) {
@@ -105,7 +126,6 @@ $sql = $conn->prepare("SELECT (SELECT `Name` FROM `elm_websites` W WHERE W.`webs
                                         `Message`, 
                                         `Success` 
                                  FROM elm_log L");
-$sql->execute();
 $sites = array();
 while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($sites, $row);
