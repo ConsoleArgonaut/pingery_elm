@@ -37,6 +37,7 @@ if(isset($_POST['elm_deletePage_Execute'])) {
 }
 //endregion
 
+//region Description
 //region Creation of HTML Content
 $HTMLContent = $HTMLContent .
     '<div style="margin-left: 15%; margin-right: 15% ">
@@ -51,27 +52,10 @@ $HTMLContent = $HTMLContent .
             </tr>
             <tr>
                 <td>Add Website:</td>
-                <th rowspan="6" style="vertical-align: text-top"><table style="width: 100%;">';
-
-//prints all webpages (overview)
-if($websites != null) {
-    foreach($websites as $url => $name) {
-        $HTMLContent = $HTMLContent .
-                            '<tr>'.
-                                '<td style="text-align: right;">'.
-                                    '<div style="color:black"><a style="color:black" href="' . $url . '">'.$name . '</a>
-                                    &nbsp;&nbsp;
-                                </td>
-                                <td style="text-align: left;">'.
-                                    $url.
-                                '</td>
-                            </tr>';
-    }
-}
-
-//add and delete Website-formular
-$HTMLContent = $HTMLContent .
-                '</div>
+                <th rowspan="6" style="vertical-align: text-top"><table style="width: 100%;">
+                [elm_WebsiteOverview]
+                
+                </div>
             </table>
         </th>
     </tr>
@@ -117,6 +101,25 @@ $HTMLContent = $HTMLContent .
     </table>
 </div>';
 //endregion
+
+//prints all webpages (overview)
+$elm_WebsiteOverview = '';
+if($websites != null) {
+    foreach($websites as $url => $name) {
+        $elm_WebsiteOverview = $elm_WebsiteOverview .
+                            '<tr>'.
+                                '<td style="text-align: right;">'.
+                                    '<div style="color:black"><a style="color:black" href="' . $url . '">'.$name . '</a>
+                                    &nbsp;&nbsp;
+                                </td>
+                                <td style="text-align: left;">'.
+                                    $url.
+                                '</td>
+                            </tr>';
+    }
+}
+
+$HTMLContent = str_replace('[elm_WebsiteOverview]', $elm_WebsiteOverview, $HTMLContent);
 
 //region Output of HTML Content
 //Gives out the html
