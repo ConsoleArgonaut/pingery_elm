@@ -103,10 +103,7 @@ foreach ($pages AS $page){
         }
     }
 }
-//Placeholders, replace with the actual code (like above)
-//$timeDate = '20.12.2012 12:34:56';
-//$online = 'Ja';
-//$message = 'Diese Webseite funktionierte wieder um 24:23:22 Uhr.';
+
 $sql = $conn->prepare("SELECT (SELECT `Name` FROM `elm_websites` W WHERE W.`websitesId` = L.`websitesFK`) AS `Name`, 
                                         (SELECT `URL` FROM `elm_websites` W WHERE W.`websitesId` = L.`websitesFK`) AS `URL`, 
                                         `Timestamp`, 
