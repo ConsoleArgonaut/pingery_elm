@@ -63,12 +63,12 @@ $HTMLContent = $HTMLContent .
     <form action="'. explode("/manage.php", $currentUrl)[0]. "/api/websites/add.php" .'" method="get" target="_blank">
         <tr>
             <td>
-                <input type="text" id="elm_addPage_Name" value="Example Website" name="URL" size="42" >
+                <input type="text" id="elm_addPage_Name" value="Example Website" name="Name" size="42" >
             </td>
         </tr>
         <tr>
             <td>
-                <input type="text" id="elm_addPage_Url" value="www.example-website.com" name="Name" size="42" >
+                <input type="text" id="elm_addPage_Url" value="www.example-website.com" name="URL" size="42" >
             </td>
         </tr>
         <tr>

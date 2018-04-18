@@ -5,18 +5,18 @@
 $urlToAdd = $_GET['URL'];
 $nameToAdd = $_GET['Name'];
 
+include("..\\..\\config.php");
+
 if (!isset($conn)){
     $conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
         PDO::ATTR_PERSISTENT => true
     ));
 }
 
-$sql = $conn->prepare("SELECT * FROM elm_websites WHERE `URL` LIKE ?;");
-$sql->bindParam(1, $urlToDelete);
-
 $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `URL` = ?;");
 $sql->bindParam(1, $urlToAdd);
-if ($sql->execute() == FALSE){
+$sql->execute();
+if ($sql->rowCount() == 0){
     $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
         VALUES
         (?, ?);");
@@ -26,7 +26,7 @@ if ($sql->execute() == FALSE){
     $sql = $conn->prepare("INSERT INTO elm_log (`websitesFK`)
             VALUE
             ((SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?));");
-    $sql->bindParam(2, $urlToAdd);
+    $sql->bindParam(1, $urlToAdd);
     $sql->execute();
 }
 ?>
