@@ -84,6 +84,7 @@ $HTMLContent = $HTMLContent .
         <tr>
             <td>
                 <h2 style="margin-top: 10%">Delete</h2>
+                Delete Website:
             </td>
         </tr>
                 
