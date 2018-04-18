@@ -70,7 +70,7 @@ $HTMLContent = $HTMLContent .
         </tr>
         <tr>
             <td>
-                <input type="text" id="elm_addPage_Url" value="https://www.example-website.com" name="URL" size="42" >
+                <input type="text" id="elm_addPage_Url" value="www.example-website.com" name="URL" size="42" >
             </td>
         </tr>
         <tr>
@@ -90,7 +90,7 @@ $HTMLContent = $HTMLContent .
                 
         <tr>
             <td>
-                <input type="text" id="elm_deletePage_Url" value="https://www.example-webseite.com" name="URL" size="42" >
+                <input type="text" id="elm_deletePage_Url" value="www.example-webseite.com" name="URL" size="42" >
             </td>
         </tr>
                 
@@ -112,7 +112,7 @@ if($websites != null) {
         $elm_WebsiteOverview = $elm_WebsiteOverview .
                             '<tr>'.
                                 '<td style="text-align: right;">'.
-                                    '<div style="color:black"><a style="color:black" href="' . $url . '">'.$name . '</a>
+                                    '<div style="color:black"><a style="color:black" href="https://' . $url . '">'.$name . '</a>
                                     &nbsp;&nbsp;
                                 </td>
                                 <td style="text-align: left;">'.
