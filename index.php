@@ -83,6 +83,7 @@ $sql->execute();
 while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($pages, $row);
 }
+
 foreach ($pages AS $page){
     $errNo = 0;
     $errStr = "";
@@ -95,7 +96,8 @@ foreach ($pages AS $page){
         $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
         $sql->bindParam(1, $page['URL']);
         $sql->bindParam(2, $message);
-        if ($sql->execute() == FALSE){
+        $sql->execute();
+        if ($sql->rowCount() == 0){
             $sql = $conn->prepare("UPDATE `elm_log`
                 SET `Message` = ?, `Success`= FALSE
                 WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
@@ -115,7 +117,8 @@ foreach ($pages AS $page){
         $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
         $sql->bindParam(1, $page['URL']);
         $sql->bindParam(2, $message);
-        if ($sql->execute() == FALSE) {
+        $sql->execute();
+        if ($sql->rowCount() == 0) {
             $sql = $conn->prepare("UPDATE `elm_log`
                 SET `Message` = ?, `Success`= FALSE
                 WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
