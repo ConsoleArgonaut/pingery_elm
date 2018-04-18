@@ -24,6 +24,9 @@ if (!isset($conn)){
         PDO::ATTR_PERSISTENT => true
     ));
 }
+
+
+//region Creates Database if not existing
 $sql = $conn->prepare("SET NAMES utf8;");
 $sql->execute();
 $sql1 = $conn->prepare("SELECT * FROM elm_log;");
@@ -71,11 +74,7 @@ if ($sql->execute() == FALSE){
         $sql->execute();
     }
 }
-
-//Gets Content from API
-$currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-$getApiUrl = explode("/index.php", $currentUrl)[0] . '/api/websites/get.php';
-$websites = json_decode(file_get_contents($getApiUrl), true);
+//endregion
 
 $pages = array();
 $sql = $conn->prepare("SELECT * FROM `elm_websites`;");
@@ -92,7 +91,31 @@ foreach ($pages AS $page){
     $ping = @fsockopen($URL, 80, $errNo, $errStr, 30);
 
     $message = "ERROR: $errNo -> $errStr";
-    if (!$ping) {
+    if ($ping) {
+        //If Ping was successful
+        $message = 'Website is online!';
+        $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
+        $sql->bindParam(1, $page['URL']);
+        $sql->bindParam(2, $message);
+        $sql->execute();
+        if ($sql->rowCount() == 0) {
+            $sql = $conn->prepare("UPDATE `elm_log`
+                SET `Message` = ?, `Success`= TRUE
+                WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
+            $sql->bindParam(1, $message);
+            $sql->bindParam(2, $page['URL']);
+            $sql->execute();
+            ?>
+            <script>
+                // parameters: service_id, template_id, template_parameters
+                (function(){
+                    emailjs.send("default_service","pinger_elm_info",{URL: "<?php $page['URL'] ?>", Name: "<?php $page['Name'] ?>"});
+                })();
+            </script>
+            <?php
+        }
+    } else {
+        //If Ping was not successful
         $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
         $sql->bindParam(1, $page['URL']);
         $sql->bindParam(2, $message);
@@ -109,27 +132,6 @@ foreach ($pages AS $page){
                 // parameters: service_id, template_id, template_parameters
                 (function(){
                     emailjs.send("default_service","pinger_elm_alert",{URL: "<?php $page['URL'] ?>", Name: "<?php $page['Name'] ?>"});
-                })();
-            </script>
-            <?php
-        }
-    } else {
-        $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
-        $sql->bindParam(1, $page['URL']);
-        $sql->bindParam(2, $message);
-        $sql->execute();
-        if ($sql->rowCount() == 0) {
-            $sql = $conn->prepare("UPDATE `elm_log`
-                SET `Message` = ?, `Success`= FALSE
-                WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
-            $sql->bindParam(1, $message);
-            $sql->bindParam(2, $page['URL']);
-            $sql->execute();
-            ?>
-            <script>
-                // parameters: service_id, template_id, template_parameters
-                (function(){
-                    emailjs.send("default_service","pinger_elm_info",{URL: "<?php $page['URL'] ?>", Name: "<?php $page['Name'] ?>"});
                 })();
             </script>
             <?php
