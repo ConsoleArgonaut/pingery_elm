@@ -137,16 +137,22 @@ foreach ($pages AS $page){
     }
 }
 
-$sql = $conn->prepare("SELECT (SELECT `Name` FROM `elm_websites` W WHERE W.`websitesId` = L.`websitesFK`) AS `Name`, 
-                                        (SELECT `URL` FROM `elm_websites` W WHERE W.`websitesId` = L.`websitesFK`) AS `URL`, 
-                                        `Timestamp`, 
-                                        `Message`, 
-                                        `Success` 
-                                 FROM elm_log L");
+$sql = $conn->prepare("SELECT 
+	elm_websites.Name as Name,
+    elm_websites.URL as URL,
+    elm_log.Timestamp as DateTime,
+    elm_log.Success as Online,
+    elm_log.Message as Message
+FROM `elm_websites`
+LEFT JOIN `elm_log`
+ON elm_websites.websitesId = elm_log.websitesFK");
+$sql->execute();
+
 $sites = array();
 while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($sites, $row);
 }
+print_r($sites);
 
 //region HTML Content creation
 $HTMLContent = $HTMLContent . '<div style=" margin-left: 15%; margin-right: 15%; margin-bottom: 10%">
