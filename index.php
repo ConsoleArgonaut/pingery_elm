@@ -17,14 +17,14 @@ $HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm</a>', $H
 $HTMLContent = '';
 //endregion
 
-
+//region Database Connection creation
 include("config.php");
 if (!isset($conn)){
     $conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
         PDO::ATTR_PERSISTENT => true
     ));
 }
-
+//endregion
 
 //region Creates Database if not existing
 $sql = $conn->prepare("SET NAMES utf8;");
@@ -52,36 +52,23 @@ if ($sql1->execute() == FALSE){
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     $sql->execute();
 }
-$sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Official PHP Website' AND `URL` = 'http://php.net';");
-if ($sql->execute() == FALSE){
-    $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
-        VALUES
-        ('Official PHP Website', 'http://php.net');");
-    $sql->execute();
-    $sql = $conn->prepare("INSERT INTO elm_log (`websitesFK`)
-            VALUE
-            ((SELECT `websitesId` FROM `elm_websites` WHERE `URL` = 'http://php.net'));");
-    $sql->execute();
-    $sql = $conn->prepare("SELECT * FROM elm_websites WHERE `Name` = 'Stackoverflow -> questions and answers' AND `URL` = 'https://stackoverflow.com';");
-    if ($sql->execute() == FALSE){
-        $sql = $conn->prepare("INSERT INTO elm_websites (`Name`, `URL`)
-            VALUES
-            ('Stackoverflow -> questions and answers', 'https://stackoverflow.com');");
-        $sql->execute();
-        $sql = $conn->prepare("INSERT INTO elm_log (`websitesFK`)
-            VALUE
-            ((SELECT `websitesId` FROM `elm_websites` WHERE `URL` = 'https://stackoverflow.com'));");
-        $sql->execute();
-    }
-}
 //endregion
 
+//region Pings Websites and adds log entries
 $pages = array();
 $sql = $conn->prepare("SELECT * FROM `elm_websites`;");
 $sql->execute();
 while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($pages, $row);
 }
+
+$MailJsHTMLContainer = '<script>
+                (function(){
+                   [elm_MailSend]
+                })();
+            </script>';
+$MailJsSendMailTemplate = 'emailjs.send("default_service","[MailTemplate]",{URL: "[URL]", Name: "[Name]"});';
+$MailSendContent = '';
 
 foreach ($pages AS $page){
     $errNo = 0;
@@ -107,14 +94,8 @@ foreach ($pages AS $page){
             $sql->bindParam(3, $_SERVER['REMOTE_ADDR']);
             $sql->bindParam(4, $page['URL']);
             $sql->execute();
-            ?>
-            <script>
-                // parameters: service_id, template_id, template_parameters
-                (function(){
-                    emailjs.send("default_service","pinger_elm_info",{URL: "<?php $page['URL'] ?>", Name: "<?php $page['Name'] ?>"});
-                })();
-            </script>
-            <?php
+
+            $MailSendContent = $MailSendContent . str_replace('[MailTemplate]', 'pinger_elm_info', str_replace('[Name]', $page['Name'], str_replace('[URL]', $page['URL'], $MailJsSendMailTemplate)));
         }
     } else {
         //If Ping was not successful
@@ -131,18 +112,16 @@ foreach ($pages AS $page){
             $sql->bindParam(3, $_SERVER['REMOTE_ADDR']);
             $sql->bindParam(4, $page['URL']);
             $sql->execute();
-            ?>
-            <script>
-                // parameters: service_id, template_id, template_parameters
-                (function(){
-                    emailjs.send("default_service","pinger_elm_alert",{URL: "<?php $page['URL'] ?>", Name: "<?php $page['Name'] ?>"});
-                })();
-            </script>
-            <?php
+
+            $MailSendContent = $MailSendContent . str_replace('[MailTemplate]', 'pinger_elm_alert', str_replace('[Name]', $page['Name'], str_replace('[URL]', $page['URL'], $MailJsSendMailTemplate)));
         }
     }
 }
+if($MailSendContent != '')
+    $HTMLContent = $HTMLContent . str_replace('[elm_MailSend]', $MailSendContent, $MailJsHTMLContainer);
+//endregion
 
+//region Gets all Websites for Log output
 $sql = $conn->prepare("SELECT 
 	elm_websites.Name as Name,
     elm_websites.URL as URL,
@@ -158,6 +137,7 @@ $sites = array();
 while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($sites, $row);
 }
+//endregion
 
 //region HTML Content creation
 $HTMLContent = $HTMLContent . '<div style=" margin-left: 15%; margin-right: 15%; margin-bottom: 10%">
