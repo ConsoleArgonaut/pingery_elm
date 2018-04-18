@@ -100,10 +100,12 @@ foreach ($pages AS $page){
         $sql->execute();
         if ($sql->rowCount() == 0) {
             $sql = $conn->prepare("UPDATE `elm_log`
-                SET `Message` = ?, `Success`= TRUE
+                SET `Message` = ?, `Success`= TRUE, `Timestamp`= ?, `callerIP`= ?
                 WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
             $sql->bindParam(1, $message);
-            $sql->bindParam(2, $page['URL']);
+            @$sql->bindParam(2, date("Y-m-d H:i:s"));
+            $sql->bindParam(3, $_SERVER['REMOTE_ADDR']);
+            $sql->bindParam(4, $page['URL']);
             $sql->execute();
             ?>
             <script>
@@ -122,10 +124,12 @@ foreach ($pages AS $page){
         $sql->execute();
         if ($sql->rowCount() == 0){
             $sql = $conn->prepare("UPDATE `elm_log`
-                SET `Message` = ?, `Success`= FALSE
+                SET `Message` = ?, `Success`= FALSE, `Timestamp`= ?, `callerIP`= ?
                 WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
             $sql->bindParam(1, $message);
-            $sql->bindParam(2, $page['URL']);
+            @$sql->bindParam(2, date("Y-m-d H:i:s"));
+            $sql->bindParam(3, $_SERVER['REMOTE_ADDR']);
+            $sql->bindParam(4, $page['URL']);
             $sql->execute();
             ?>
             <script>
@@ -190,7 +194,7 @@ foreach($sites as $site) {
             '</td>'.
 
             '<td style="text-align: center;">'.
-                ($site['Online'] == '1' ? 'Ja' : 'Nein').
+                ($site['Online'] == '1' ? 'Yes' : 'No').
             '</td>'.
 
             '<td style="text-align: center;">'.
