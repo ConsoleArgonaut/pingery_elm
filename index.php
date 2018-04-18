@@ -27,22 +27,25 @@ if (!isset($conn)){
 $sql = $conn->prepare("SET NAMES utf8;");
 $sql->execute();
 $sql1 = $conn->prepare("SELECT * FROM elm_log;");
+$sql1->execute();
 if ($sql1->execute() == FALSE){
     $sql = $conn->prepare("CREATE TABLE `elm_websites` (
-        `websitesId` int(11) NOT NULL,
+        `websitesId` int(11) NOT NULL AUTO_INCREMENT,
         `Name` varchar(255) NOT NULL,
         `URL` varchar(255) NOT NULL,
         `Created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+        `Updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (`websitesId`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     $sql->execute();
     $sql = $conn->prepare("CREATE TABLE `elm_log` (
-        `logId` int(11) NOT NULL,
+        `logId` int(11) NOT NULL AUTO_INCREMENT,
         `websitesFK` int(11),
         `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `Message` varchar(255) NOT NULL,
         `Success` BOOLEAN,
-        `callerIP` varchar(255) NOT NULL
+        `callerIP` varchar(255) NOT NULL,
+        PRIMARY KEY (`logId`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     $sql->execute();
 }
@@ -69,15 +72,6 @@ if ($sql->execute() == FALSE){
     }
 }
 
-//Code to create HMTL page content
-//Replaces default values in index.html
-$HTML = file_get_contents('html/index.html', FILE_USE_INCLUDE_PATH);
-$HTML = str_replace('[elm_Login_Text]', 'Manage Websites', $HTML);
-$HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm</a>', $HTML);
-
-//Replace this with log information!!!
-$HTMLContent = '';
-
 //Gets Content from API
 $currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 $getApiUrl = explode("/index.php", $currentUrl)[0] . '/api/websites/get.php';
@@ -90,10 +84,12 @@ while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($pages, $row);
 }
 foreach ($pages AS $page){
-    require_once("html/index.html");
     $errNo = 0;
     $errStr = "";
-    $ping = fsockopen($URL, $errNo, $errStr);
+    $URL = $page['URL'];
+
+    $ping = @fsockopen($URL, 80, $errNo, $errStr, 30);
+
     $message = "ERROR: $errNo -> $errStr";
     if (!$ping) {
         $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
