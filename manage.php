@@ -38,9 +38,12 @@ if(isset($_POST['elm_deletePage_Execute'])) {
 //endregion
 
 //region Creation of HTML Content
+//set and design the table
 $HTMLContent = $HTMLContent .
     '<div style="margin-left: 15%; margin-right: 15% ">
-        <table style="width:100%" >
+        <table style="width:130%" >
+        
+        
             <tr>
                 <td>
                     <h2>Edit</h2>
@@ -67,12 +70,12 @@ $HTMLContent = $HTMLContent .
         </tr>
         <tr>
             <td>
-                <input type="text" id="elm_addPage_Url" value="www.example-website.com" name="URL" size="42" >
+                <input type="text" id="elm_addPage_Url" value="https://www.example-website.com" name="URL" size="42" >
             </td>
         </tr>
         <tr>
             <td >
-                <input type="submit" value=" OK " id="elm_addPage_Execute" name="elm_addPage_Execute">
+                <input type="submit" value=" OK " id="elm_addPage_Execute" name="elm_addPage_Execute" style="height:7%; width:10%">
             </td>
         </tr>
     </form>
@@ -86,13 +89,13 @@ $HTMLContent = $HTMLContent .
                 
         <tr>
             <td>
-                <input type="text" id="elm_deletePage_Url" value="www.example-webseite.com" name="URL" size="42" >
+                <input type="text" id="elm_deletePage_Url" value="https://www.example-webseite.com" name="URL" size="42" >
             </td>
         </tr>
                 
         <tr>
             <td>
-                <input type="submit" value=" OK " id="elm_deletePage_Execute" name="elm_deletePage_Execute">
+                <input type="submit" value=" OK " id="elm_deletePage_Execute" name="elm_deletePage_Execute" style="height:7%; width:10%">
             </td>
         </tr>
     </form>

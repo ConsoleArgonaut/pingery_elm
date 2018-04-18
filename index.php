@@ -140,11 +140,16 @@ while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
 //endregion
 
 //region HTML Content creation
-$HTMLContent = $HTMLContent . '<div style=" margin-left: 15%; margin-right: 15%; margin-bottom: 10%">
+$HTMLContent = $HTMLContent . '<div style=" margin-left: 5%;  margin-bottom: 10%">
     <h2>Welcome to Pingery-Elm</h2>
     <br>
 
-    <table style="width:100%" >
+    <table style="width:115%" >
+    <col width="15%">
+    <col width="15%">
+    <col width="15%">
+    <col width="15%">
+    <col width="30%">
         <tr>
             <th><h3>Website</h3></th>
             <th><h3>URL</h3></th>
