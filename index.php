@@ -175,7 +175,7 @@ foreach($sites as $site) {
     $elm_WebsiteOverview = $elm_WebsiteOverview .
         '<tr>'.
             '<td style="text-align: left;">'.
-                '<div style="color:black"><a style="color:black" href="' . $site['URL'] . '">'. $site['Name'] . '</a> &nbsp;&nbsp;'.
+                '<div style="color:black"><a style="color:black" target="_blank" href="' . $site['URL'] . '">'. $site['Name'] . '</a> &nbsp;&nbsp;'.
 
             '</td>'.
 
@@ -188,7 +188,7 @@ foreach($sites as $site) {
             '</td>'.
 
             '<td style="text-align: center;">'.
-                $site['Online'].
+                ($site['Online'] == '1' ? 'Ja' : 'Nein').
             '</td>'.
 
             '<td style="text-align: center;">'.
