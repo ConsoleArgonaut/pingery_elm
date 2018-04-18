@@ -152,7 +152,6 @@ $sites = array();
 while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($sites, $row);
 }
-print_r($sites);
 
 //region HTML Content creation
 $HTMLContent = $HTMLContent . '<div style=" margin-left: 15%; margin-right: 15%; margin-bottom: 10%">
@@ -172,29 +171,29 @@ $HTMLContent = $HTMLContent . '<div style=" margin-left: 15%; margin-right: 15%;
 </div>';
 
 $elm_WebsiteOverview = '';
-foreach($sites as $url => $name) {
+foreach($sites as $site) {
     $elm_WebsiteOverview = $elm_WebsiteOverview .
         '<tr>'.
             '<td style="text-align: left;">'.
-                '<div style="color:black"><a style="color:black" href="' . $url . '">'. $name . '</a> &nbsp;&nbsp;'.
+                '<div style="color:black"><a style="color:black" href="' . $site['URL'] . '">'. $site['Name'] . '</a> &nbsp;&nbsp;'.
 
             '</td>'.
 
             '<td style="text-align: left;">'.
-                $url.
+                $site['URL'].
             '</td>'.
 
             '<td style="text-align: center;">'.
-                $timeDate.
+                $site['DateTime'].
             '</td>'.
 
             '<td style="text-align: center;">'.
-                $online.
+                $site['Online'].
             '</td>'.
 
             '<td style="text-align: center;">'.
-            '<div style="color:'.($online == 'Ja' ? 'green' : 'red').'">'.
-                $message.
+            '<div style="color:'.($site['Online'] == '1' ? 'green' : 'red').'">'.
+                $site['Message'].
             '</div></td>'.
 
         '</tr></div>';
