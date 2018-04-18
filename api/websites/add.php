@@ -29,4 +29,17 @@ if ($sql->rowCount() == 0){
     $sql->bindParam(1, $urlToAdd);
     $sql->execute();
 }
+
+//Redirect to manage.php after execution
+$HTML = '<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="refresh" content="0; URL=\'[elm_RefreshURL]\'" />
+    </head>
+</html>';
+$currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+echo str_replace('[elm_RefreshURL]', explode("/api/websites/add.php", $currentUrl)[0]. "/manage.php", $HTML);
+
 ?>
+

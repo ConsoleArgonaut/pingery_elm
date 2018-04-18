@@ -37,7 +37,6 @@ if(isset($_POST['elm_deletePage_Execute'])) {
 }
 //endregion
 
-//region Description
 //region Creation of HTML Content
 $HTMLContent = $HTMLContent .
     '<div style="margin-left: 15%; margin-right: 15% ">
@@ -60,7 +59,7 @@ $HTMLContent = $HTMLContent .
         </th>
     </tr>
 
-    <form action="'. explode("/manage.php", $currentUrl)[0]. "/api/websites/add.php" .'" method="get" target="_blank">
+    <form action="'. explode("/manage.php", $currentUrl)[0]. "/api/websites/add.php" .'" method="get" target="_top">
         <tr>
             <td>
                 <input type="text" id="elm_addPage_Name" value="Example Website" name="Name" size="42" >
@@ -78,7 +77,7 @@ $HTMLContent = $HTMLContent .
         </tr>
     </form>
                         
-    <form action="'.explode("/manage.php", $currentUrl)[0]. "/api/websites/delete.php".'" method="get" target="_blank">
+    <form action="'.explode("/manage.php", $currentUrl)[0]. "/api/websites/delete.php".'" method="get" target="_top">
         <tr>
             <td>
                 <h2 style="margin-top: 10%">Delete</h2>
