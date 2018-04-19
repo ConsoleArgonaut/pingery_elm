@@ -167,7 +167,7 @@ $HTMLContent = $HTMLContent . '<div style=" margin-left: 5%;  margin-bottom: 10%
 
     <table style="width:115%" >
     <col width="15%">
-    <col width="15%">
+    <col width="20%">
     <col width="15%">
     <col width="15%">
     <col width="30%">

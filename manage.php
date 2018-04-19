@@ -7,7 +7,7 @@
 //Code to create HMTL page content
 //Replaces default values in index.html
 $HTML = file_get_contents('html/index.html', FILE_USE_INCLUDE_PATH);
-$HTML = str_replace('[elm_Login_Link]', '..\\index.php', $HTML);
+$HTML = str_replace('[elm_Login_Link]', 'index.php', $HTML);
 $HTML = str_replace('[elm_Login_Text]', 'See log', $HTML);
 $HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm - Manage websites</a>', $HTML);
 
@@ -41,20 +41,20 @@ if(isset($_POST['elm_deletePage_Execute'])) {
 //set and design the table
 $HTMLContent = $HTMLContent .
     '<div style="margin-left: 15%; margin-right: 15% ">
-        <table style="width:130%" >
+        <table style="width:130%">
         
         
             <tr>
                 <td>
                     <h2>Edit</h2>
                 </td>
-                <th>
-                    <h2 >Website overview</h2>
+                <th style="text-align: left;">
+                    <p><h2 >Website overview</h2></p>
                 </th>
             </tr>
             <tr>
                 <td>Add Website:</td>
-                <th rowspan="6" style="vertical-align: text-top"><table style="width: 100%;">
+                <th rowspan="6" style="vertical-align: text-top"><table style="width: 100%;text-align: left;">
                 [elm_WebsiteOverview]
                 
                 </div>
@@ -111,8 +111,8 @@ if($websites != null) {
     foreach($websites as $url => $name) {
         $elm_WebsiteOverview = $elm_WebsiteOverview .
                             '<tr>'.
-                                '<td style="text-align: right;">'.
-                                    '<div style="color:black"><a style="color:black" href="https://' . $url . '">'.$name . '</a>
+                                '<td style="text-align: left;">'.
+                                    '<div style="color:black"><a style="color:black" target="_blank" href="https://' . $url . '">'.$name . '</a>
                                     &nbsp;&nbsp;
                                 </td>
                                 <td style="text-align: left;">'.
