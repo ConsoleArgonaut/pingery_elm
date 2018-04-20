@@ -1,6 +1,8 @@
 <?php
-// This file is the secondary file of pingery elm
-// This is file is used to show the different existing websites and give the possibility to delete or add them
+/**
+ * This file is the secondary file of pingery elm
+ * This is file is used to show the different existing websites and give the possibility to delete or add them
+*/
 
 //region Base HTML Creation
 //Code to create HMTL page content
@@ -21,14 +23,16 @@ $websites = json_decode(file_get_contents($getApiUrl), true);
 //endregion
 
 //region Creation of HTML Content
-//set and design the table
+// Set and design the table
 $HTMLContent = $HTMLContent . file_get_contents('html/contentblocks/ManageViewContainer.html', FILE_USE_INCLUDE_PATH);
 //endregion
 
-//prints all webpages (overview)
+//region Print out all Webpages
+// Gets template
 $ManageViewContent = file_get_contents('html/contentblocks/ManageViewWebsiteOverviewContent.html', FILE_USE_INCLUDE_PATH);
 
 $elm_WebsiteOverview = '';
+//Adds each webpage to html
 if($websites != null) {
     foreach($websites as $url => $name) {
         $elm_WebsiteOverview = $elm_WebsiteOverview .
@@ -36,8 +40,8 @@ if($websites != null) {
                 str_replace('[elm_Website_URL]', $url, $ManageViewContent));
     }
 }
-
 $HTMLContent = str_replace('[elm_WebsiteOverview]', $elm_WebsiteOverview, $HTMLContent);
+//endregion
 
 //region Output of HTML Content
 //Gives out the html
