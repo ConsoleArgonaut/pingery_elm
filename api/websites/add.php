@@ -7,7 +7,6 @@ $nameToAdd = $_GET['Name'];
 
 // Include the config file to access the database connections if necessary
 include("..\\..\\config.php");
-
 // if variable $conn isn't set, create a database connection with the variables $elm_Settings_DSN, $elm_Settings_DbUser and $elm_Settings_DbPassword as defined in the config.php file
 if (!isset($conn)){
     $conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
@@ -43,7 +42,7 @@ $HTML = '<!DOCTYPE html>
     </head>
 </html>';
 $currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-
+// execute redirect
 echo str_replace('[elm_RefreshURL]', explode("/api/websites/add.php", $currentUrl)[0]. "/manage.php", $HTML);
 
 ?>
