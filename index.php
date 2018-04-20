@@ -5,6 +5,9 @@ session_start();
 // This file is used to show the log and execute the website checks
 // IMPORTANT DO NOT CREATE ANY FUNCTIONS!!!
 
+// Include the config file to access the database connections if necessary
+include("config.php");
+
 //region Default HTML Content
 //Code to create HMTL page content
 //Replaces default values in index.html
@@ -12,14 +15,13 @@ $HTML = file_get_contents('html/index.html', FILE_USE_INCLUDE_PATH);
 $HTML = str_replace('[elm_Login_Text]', 'Manage Websites', $HTML);
 $HTML = str_replace('[elm_Login_Link]', 'manage.php', $HTML);
 $HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm</a>', $HTML);
+$HTML = str_replace('[elm_MailJS_UserID]', $elm_MailJS_UserID, $HTML);
 
 //Replace this with log information!!!
 $HTMLContent = '';
 //endregion
 
 //region Database Connection creation
-// Include the config file to access the database connections if necessary
-include("config.php");
 // if variable $conn isn't set, create a database connection with the variables $elm_Settings_DSN, $elm_Settings_DbUser and $elm_Settings_DbPassword as defined in the config.php file
 if (!isset($conn)){
     $conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
