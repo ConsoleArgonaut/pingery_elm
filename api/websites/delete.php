@@ -25,6 +25,6 @@ $HTML = '<!DOCTYPE html>
     </head>
 </html>';
 $currentUrl = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-
+// execute redirect
 echo str_replace('[elm_RefreshURL]', explode("/api/websites/delete.php", $currentUrl)[0]. "/manage.php", $HTML);
 ?>
