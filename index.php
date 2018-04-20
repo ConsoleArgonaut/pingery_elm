@@ -17,7 +17,6 @@ $HTML = str_replace('[elm_Login_Link]', 'manage.php', $HTML);
 $HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm</a>', $HTML);
 $HTML = str_replace('[elm_MailJS_UserID]', $elm_MailJS_UserID, $HTML);
 
-//Replace this with log information!!!
 $HTMLContent = '';
 //endregion
 
@@ -73,6 +72,7 @@ while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($pages, $row);
 }
 
+// prepare mail-containers
 $MailJsHTMLContainer = file_get_contents('html/contentblocks/MailJSContainer.html', FILE_USE_INCLUDE_PATH);
 $MailJsSendMailTemplate = file_get_contents('html/contentblocks/MailJSSend.html', FILE_USE_INCLUDE_PATH);
 $MailSendContent = '';
