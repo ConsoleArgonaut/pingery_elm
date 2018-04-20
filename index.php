@@ -1,9 +1,13 @@
 <?php
 session_start();
 
-// This file is the main file of pingery elm
-// This file is used to show the log and execute the website checks
-// IMPORTANT DO NOT CREATE ANY FUNCTIONS!!!
+/**
+ * This file is the main file of pingery elm
+ * This file is used to show the log and execute the website checks
+ */
+
+// Include the config file to access the database connections if necessary
+include("config.php");
 
 //region Default HTML Content
 //Code to create HMTL page content
@@ -12,13 +16,13 @@ $HTML = file_get_contents('html/index.html', FILE_USE_INCLUDE_PATH);
 $HTML = str_replace('[elm_Login_Text]', 'Manage Websites', $HTML);
 $HTML = str_replace('[elm_Login_Link]', 'manage.php', $HTML);
 $HTML = str_replace('[elm_Page_NavBar]', '<a class="active">Pingery elm</a>', $HTML);
+$HTML = str_replace('[elm_MailJS_UserID]', $elm_MailJS_UserID, $HTML);
 
-//Replace this with log information!!!
 $HTMLContent = '';
 //endregion
 
 //region Database Connection creation
-include("config.php");
+// If variable $conn isn't set, create a database connection with the variables $elm_Settings_DSN, $elm_Settings_DbUser and $elm_Settings_DbPassword as defined in the config.php file
 if (!isset($conn)){
     $conn = new PDO($elm_Settings_DSN, $elm_Settings_DbUser, $elm_Settings_DbPassword, array(
         PDO::ATTR_PERSISTENT => true
@@ -27,11 +31,15 @@ if (!isset($conn)){
 //endregion
 
 //region Creates Database if not existing
+// Set database collation to UTF8
 $sql = $conn->prepare("SET NAMES utf8;");
 $sql->execute();
+// Check if database was created
 $sql1 = $conn->prepare("SELECT * FROM elm_log;");
 $sql1->execute();
+// If tables do not exist yet, create them
 if ($sql1->execute() == FALSE){
+    // Create table elm_websites
     $sql = $conn->prepare("CREATE TABLE `elm_websites` (
         `websitesId` int(11) NOT NULL AUTO_INCREMENT,
         `Name` varchar(255) NOT NULL,
@@ -41,6 +49,7 @@ if ($sql1->execute() == FALSE){
         PRIMARY KEY (`websitesId`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
     $sql->execute();
+    // Create table elm_log
     $sql = $conn->prepare("CREATE TABLE `elm_log` (
         `logId` int(11) NOT NULL AUTO_INCREMENT,
         `websitesFK` int(11),
@@ -56,36 +65,40 @@ if ($sql1->execute() == FALSE){
 
 //region Pings Websites and adds log entries
 $pages = array();
+// get all entries in elm_websites
 $sql = $conn->prepare("SELECT * FROM `elm_websites`;");
 $sql->execute();
+// Push all results of previous query into array $pages
 while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($pages, $row);
 }
 
-$MailJsHTMLContainer = '<script>
-                (function(){
-                   [elm_MailSend]
-                })();
-            </script>';
-$MailJsSendMailTemplate = 'emailjs.send("default_service","[MailTemplate]",{URL: "[URL]", Name: "[Name]"});';
+// Prepare mail-containers
+$MailJsHTMLContainer = file_get_contents('html/contentblocks/MailJSContainer.html', FILE_USE_INCLUDE_PATH);
+$MailJsSendMailTemplate = file_get_contents('html/contentblocks/MailJSSend.html', FILE_USE_INCLUDE_PATH);
 $MailSendContent = '';
 
+// Perform ping for all entries in the array $pages
 foreach ($pages AS $page){
     $errNo = 0;
     $errStr = "";
     $URL = $page['URL'];
 
+    // Perform ping to provided URL
     $ping = @fsockopen($URL, 80, $errNo, $errStr, 30);
 
+    // Add the result of the ping to variable $message
     $message = "ERROR: $errNo -> $errStr";
     if ($ping) {
         //If Ping was successful
         $message = 'Website is online!';
+        // See if the current entry pertaining to the URL is the same
         $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
         $sql->bindParam(1, $page['URL']);
         $sql->bindParam(2, $message);
         $sql->execute();
         if ($sql->rowCount() == 0) {
+            // If the result differs write to elm_log
             $sql = $conn->prepare("UPDATE `elm_log`
                 SET `Message` = ?, `Success`= TRUE, `Timestamp`= ?, `callerIP`= ?
                 WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
@@ -95,15 +108,21 @@ foreach ($pages AS $page){
             $sql->bindParam(4, $page['URL']);
             $sql->execute();
 
-            $MailSendContent = $MailSendContent . str_replace('[MailTemplate]', 'pinger_elm_info', str_replace('[Name]', $page['Name'], str_replace('[URL]', $page['URL'], $MailJsSendMailTemplate)));
+            // Send mail that the URL is now online
+            $MailSendContent = $MailSendContent .
+                str_replace('[MailTemplate]', 'pinger_elm_info',
+                    str_replace('[Name]', $page['Name'],
+                        str_replace('[URL]', $page['URL'], $MailJsSendMailTemplate)));
         }
     } else {
-        //If Ping was not successful
+        // If Ping was not successful
+        // See if the current entry pertaining to the URL is the same
         $sql = $conn->prepare("SELECT * FROM elm_log WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?) AND `Message` = ?;");
         $sql->bindParam(1, $page['URL']);
         $sql->bindParam(2, $message);
         $sql->execute();
         if ($sql->rowCount() == 0){
+            // If the result differs write to elm_log
             $sql = $conn->prepare("UPDATE `elm_log`
                 SET `Message` = ?, `Success`= FALSE, `Timestamp`= ?, `callerIP`= ?
                 WHERE `websitesFK` = (SELECT `websitesId` FROM `elm_websites` WHERE `URL` = ?);");
@@ -113,15 +132,21 @@ foreach ($pages AS $page){
             $sql->bindParam(4, $page['URL']);
             $sql->execute();
 
-            $MailSendContent = $MailSendContent . str_replace('[MailTemplate]', 'pinger_elm_alert', str_replace('[Name]', $page['Name'], str_replace('[URL]', $page['URL'], $MailJsSendMailTemplate)));
+            // Send mail that the URL is now online
+            $MailSendContent = $MailSendContent .
+                str_replace('[MailTemplate]', 'pinger_elm_alert',
+                    str_replace('[Name]', $page['Name'],
+                        str_replace('[URL]', $page['URL'], $MailJsSendMailTemplate)));
         }
     }
 }
+// Variable $MailSendContent isn't empty send mail
 if($MailSendContent != '')
     $HTMLContent = $HTMLContent . str_replace('[elm_MailSend]', $MailSendContent, $MailJsHTMLContainer);
 //endregion
 
 //region Gets all Websites for Log output
+// Get all required database entries required to output log
 $sql = $conn->prepare("SELECT 
 	elm_websites.Name as Name,
     elm_websites.URL as URL,
@@ -134,55 +159,26 @@ ON elm_websites.websitesId = elm_log.websitesFK");
 $sql->execute();
 
 $sites = array();
+// Push all results of previous query into array $pages
 while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($sites, $row);
 }
 //endregion
 
 //region HTML Content creation
-$HTMLContent = $HTMLContent . '<div style=" margin-left: 15%; margin-right: 15%; margin-bottom: 10%">
-    <h2>Welcome to Pingery-Elm</h2>
-    <br>
-
-    <table style="width:100%" >
-        <tr>
-            <th><h3>Website</h3></th>
-            <th><h3>URL</h3></th>
-            <th><h3>date / time</h3></th>
-            <th><h3>online</h3></th>
-            <th><h3>Message</h3></th>
-        </tr>
-        [elm_WebsiteOverview]
-    </table>
-</div>';
+$HTMLContent = $HTMLContent . file_get_contents('html/contentblocks/LogViewContainer.html', FILE_USE_INCLUDE_PATH);
+$LogViewContent = file_get_contents('html/contentblocks/LogViewContent.html', FILE_USE_INCLUDE_PATH);
 
 $elm_WebsiteOverview = '';
 foreach($sites as $site) {
+    //Creates row with website info
     $elm_WebsiteOverview = $elm_WebsiteOverview .
-        '<tr>'.
-            '<td style="text-align: left;">'.
-                '<div style="color:black"><a style="color:black" target="_blank" href="' . $site['URL'] . '">'. $site['Name'] . '</a> &nbsp;&nbsp;'.
-
-            '</td>'.
-
-            '<td style="text-align: left;">'.
-                $site['URL'].
-            '</td>'.
-
-            '<td style="text-align: center;">'.
-                $site['DateTime'].
-            '</td>'.
-
-            '<td style="text-align: center;">'.
-                ($site['Online'] == '1' ? 'Yes' : 'No').
-            '</td>'.
-
-            '<td style="text-align: center;">'.
-            '<div style="color:'.($site['Online'] == '1' ? 'green' : 'red').'">'.
-                $site['Message'].
-            '</div></td>'.
-
-        '</tr></div>';
+        str_replace('[elm_Website_URL]', $site['URL'],
+            str_replace('[elm_Website_Name]', $site['Name'],
+                str_replace('[elm_Website_DateTime]', $site['DateTime'],
+                    str_replace('[elm_Website_Message]', $site['Message'],
+                        str_replace('[elm_Website_Message_Color]', ($site['Online'] == '1' ? 'green' : 'red'),
+                            str_replace('[elm_Website_Online]', ($site['Online'] == '1' ? 'Yes' : 'No'), $LogViewContent))))));
 }
 $HTMLContent = str_replace('[elm_WebsiteOverview]', $elm_WebsiteOverview, $HTMLContent);
 
