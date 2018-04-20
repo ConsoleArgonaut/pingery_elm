@@ -20,101 +20,20 @@ $getApiUrl = explode("/manage.php", $currentUrl)[0] . '/api/websites/get.php';
 $websites = json_decode(file_get_contents($getApiUrl), true);
 //endregion
 
-//region Posts to apis
-//Checks if addPage is clicked and sends the data to the api
-if(isset($_POST['elm_addPage_Execute'])) {
-    $r = new HttpRequest(explode("/api/websites/add.php", $currentUrl)[0]. "/api/websites/add.php?URL=" .$_POST['URL'].'&Name='.$_POST['Name'], HttpRequest::METH_GET);
-    $r->send();
-}
-//Checks if deletePage is clicked and sends the data (whith page) to the api
-if(isset($_POST['elm_deletePage_Execute'])) {
-    $r = new HttpRequest(explode("/api/websites/delete.php", $currentUrl)[0]. "/api/websites/add.php?URL=" .$_POST['URL'], HttpRequest::METH_GET);
-    $r->send();
-}
-//endregion
-
 //region Creation of HTML Content
 //set and design the table
-$HTMLContent = $HTMLContent .
-    '<div style="margin-left: 15%; margin-right: 15% ">
-        <table style="width:130%">
-        
-        
-            <tr>
-                <td>
-                    <h2>Edit</h2>
-                </td>
-                <th style="text-align: left;">
-                    <p><h2 >Website overview</h2></p>
-                </th>
-            </tr>
-            <tr>
-                <td>Add Website:</td>
-                <th rowspan="6" style="vertical-align: text-top"><table style="width: 100%;text-align: left;">
-                [elm_WebsiteOverview]
-                
-                </div>
-            </table>
-        </th>
-    </tr>
-
-    <form action="'. explode("/manage.php", $currentUrl)[0]. "/api/websites/add.php" .'" method="get" target="_top">
-        <tr>
-            <td>
-                <input type="text" id="elm_addPage_Name" value="Example Website" name="Name" size="42" >
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input type="text" id="elm_addPage_Url" value="www.example-website.com" name="URL" size="42" >
-            </td>
-        </tr>
-        <tr>
-            <td >
-                <input type="submit" value=" OK " id="elm_addPage_Execute" name="elm_addPage_Execute" style="height:7%; width:10%">
-            </td>
-        </tr>
-    </form>
-                        
-    <form action="'.explode("/manage.php", $currentUrl)[0]. "/api/websites/delete.php".'" method="get" target="_top">
-        <tr>
-            <td>
-                <h2 style="margin-top: 10%">Delete</h2>
-                Delete Website:
-            </td>
-        </tr>
-                
-        <tr>
-            <td>
-                <input type="text" id="elm_deletePage_Url" value="www.example-webseite.com" name="URL" size="42" >
-            </td>
-        </tr>
-                
-        <tr>
-            <td>
-                <input type="submit" value=" OK " id="elm_deletePage_Execute" name="elm_deletePage_Execute" style="height:7%; width:10%">
-            </td>
-        </tr>
-    </form>
-
-    </table>
-</div>';
+$HTMLContent = $HTMLContent . file_get_contents('html/contentblocks/ManageViewContainer.html', FILE_USE_INCLUDE_PATH);
 //endregion
 
 //prints all webpages (overview)
+$ManageViewContent = file_get_contents('html/contentblocks/ManageViewWebsiteOverviewContent.html', FILE_USE_INCLUDE_PATH);
+
 $elm_WebsiteOverview = '';
 if($websites != null) {
     foreach($websites as $url => $name) {
         $elm_WebsiteOverview = $elm_WebsiteOverview .
-                            '<tr>'.
-                                '<td style="text-align: left;">'.
-                                    '<div style="color:black"><a style="color:black" target="_blank" href="https://' . $url . '">'.$name . '</a>
-                                    &nbsp;&nbsp;
-                                </td>
-                                <td style="text-align: left;">'.
-                                    $url.
-                                '</td>
-                            </tr>';
+            str_replace('[elm_Website_Name]', $name,
+                str_replace('[elm_Website_URL]', $url, $ManageViewContent));
     }
 }
 
