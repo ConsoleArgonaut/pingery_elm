@@ -1,4 +1,11 @@
 <?php
+
+/**
+ * This variable is used for the MailJS implementation
+ * This is the UserID used to connect to MailJS
+ */
+$elm_MailJS_UserID = 'user_m2krypvNlX5KYxMhLw22L';
+
 /**
  * This variable is used to determine to what database type one wants to connect
  */
