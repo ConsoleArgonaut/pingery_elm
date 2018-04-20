@@ -73,12 +73,8 @@ while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
     array_push($pages, $row);
 }
 
-$MailJsHTMLContainer = '<script>
-                (function(){
-                   [elm_MailSend]
-                })();
-            </script>';
-$MailJsSendMailTemplate = 'emailjs.send("default_service","[MailTemplate]",{URL: "[URL]", Name: "[Name]"});';
+$MailJsHTMLContainer = file_get_contents('html/contentblocks/MailJSContainer.html', FILE_USE_INCLUDE_PATH);
+$MailJsSendMailTemplate = file_get_contents('html/contentblocks/MailJSSend.html', FILE_USE_INCLUDE_PATH);
 $MailSendContent = '';
 
 // perform ping for all entries in the array $pages
@@ -163,54 +159,19 @@ while ($row = $sql->fetch(PDO::FETCH_ASSOC)){
 //endregion
 
 //region HTML Content creation
-$HTMLContent = $HTMLContent . '<div style=" margin-left: 5%;  margin-bottom: 10%">
-    <h2>Welcome to Pingery-Elm</h2>
-    <br>
-
-    <table style="width:115%" >
-    <col width="15%">
-    <col width="20%">
-    <col width="15%">
-    <col width="15%">
-    <col width="30%">
-        <tr>
-            <th><h3>Website</h3></th>
-            <th><h3>URL</h3></th>
-            <th><h3>date / time</h3></th>
-            <th><h3>online</h3></th>
-            <th><h3>Message</h3></th>
-        </tr>
-        [elm_WebsiteOverview]
-    </table>
-</div>';
+$HTMLContent = $HTMLContent . file_get_contents('html/contentblocks/LogViewContainer.html', FILE_USE_INCLUDE_PATH);
+$LogViewContent = file_get_contents('html/contentblocks/LogViewContent.html', FILE_USE_INCLUDE_PATH);
 
 $elm_WebsiteOverview = '';
 foreach($sites as $site) {
+    //Creates row with website info
     $elm_WebsiteOverview = $elm_WebsiteOverview .
-        '<tr>'.
-            '<td style="text-align: left;">'.
-                '<div style="color:black"><a style="color:black" target="_blank" href="https://' . $site['URL'] . '">'. $site['Name'] . '</a> &nbsp;&nbsp;'.
-
-            '</td>'.
-
-            '<td style="text-align: left;">'.
-                $site['URL'].
-            '</td>'.
-
-            '<td style="text-align: center;">'.
-                $site['DateTime'].
-            '</td>'.
-
-            '<td style="text-align: center;">'.
-                ($site['Online'] == '1' ? 'Yes' : 'No').
-            '</td>'.
-
-            '<td style="text-align: center;">'.
-            '<div style="color:'.($site['Online'] == '1' ? 'green' : 'red').'">'.
-                $site['Message'].
-            '</div></td>'.
-
-        '</tr></div>';
+        str_replace('[elm_Website_URL]', $site['URL'],
+            str_replace('[elm_Website_Name]', $site['Name'],
+                str_replace('[elm_Website_DateTime]', $site['DateTime'],
+                    str_replace('[elm_Website_Message]', $site['Message'],
+                        str_replace('[elm_Website_Message_Color]', ($site['Online'] == '1' ? 'green' : 'red'),
+                            str_replace('[elm_Website_Online]', ($site['Online'] == '1' ? 'Yes' : 'No'), $LogViewContent))))));
 }
 $HTMLContent = str_replace('[elm_WebsiteOverview]', $elm_WebsiteOverview, $HTMLContent);
 
